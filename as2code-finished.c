@@ -82,7 +82,7 @@ static inline const uint8_t* font5x8_get_digit_u8(uint8_t time_remaining) {
 		case 7: return font5x8_digit_7;
 		case 8: return font5x8_digit_8;
 		case 9: return font5x8_digit_9;
-		default: return 0;  /* ·ÀÓù£º²»Ö§³ÖµÄÊı×Ö */
+		default: return 0;  /* é˜²å¾¡ï¼šä¸æ”¯æŒçš„æ•°å­— */
 	}
 }
 
@@ -92,7 +92,7 @@ static inline const uint8_t* font5x8_get_modeindex_u8(uint8_t index_mi) {
 		case 1: return font5x8_letter_p;  /* MODE_POPCORN */
 		case 2: return font5x8_letter_b;  /* MODE_BEVERAGE */
 		case 3: return font5x8_letter_d;  /* MODE_DEFROST */
-		default: return 0;             /* ·ÀÓù£º²»Ö§³ÖµÄÄ£Ê½Ë÷Òı */
+		default: return 0;             /* é˜²å¾¡ï¼šä¸æ”¯æŒçš„æ¨¡å¼ç´¢å¼• */
 	}
 }
 
@@ -106,30 +106,30 @@ static inline void fb_draw_glyph5x8(uint8_t x0, const uint8_t *g){
 	for(uint8_t i=0;i<5;i++){
 		uint8_t xi = (uint8_t)(x0 + i);
 		if(xi >= 16) break;
-		fb[xi] = g[i];                 /* Ö±½Ó¸²¸ÇĞ´£º1bit/ÏñËØ */
+		fb[xi] = g[i];                 /* ç›´æ¥è¦†ç›–å†™ï¼š1bit/åƒç´  */
 	}
 }
 
 extern uint8_t spi_send_byte(uint8_t b);
 
 static inline void ledmx_flush(void){
-	PORTB &= ~(1<<PINB4);		//À­µÍssÊäËÍÊı¾İ
-	spi_send_byte(0x00);            // ÕÕ¿ÎÌÃÀı×Ó£ºÏÈ·¢Ò»¸öÖ¡ÆğÊ¼/ÃüÁî×Ö½Ú
+	PORTB &= ~(1<<PINB4);		//æ‹‰ä½ssè¾“é€æ•°æ®
+	spi_send_byte(0x00);            // ç…§è¯¾å ‚ä¾‹å­ï¼šå…ˆå‘ä¸€ä¸ªå¸§èµ·å§‹/å‘½ä»¤å­—èŠ‚
 
-	for(uint8_t y=0; y<8; y++){     // 8 ĞĞ
-		for(uint8_t x=0; x<16; x++){// 16 ÁĞ ¡ú 8*16=128 ×Ö½Ú
-			uint8_t on = (fb[x] >> y) & 0x01;   // È¡ (x,y) ÏñËØ
-			spi_send_byte(on ? 0xFF : 0x00);    // 1bit Õ¹¿ªÎª 1 ×Ö½ÚÁÁ¶È
+	for(uint8_t y=0; y<8; y++){     // 8 è¡Œ
+		for(uint8_t x=0; x<16; x++){// 16 åˆ— â†’ 8*16=128 å­—èŠ‚
+			uint8_t on = (fb[x] >> y) & 0x01;   // å– (x,y) åƒç´ 
+			spi_send_byte(on ? 0x0F : 0x00);    // 1bit å±•å¼€ä¸º 1 å­—èŠ‚äº®åº¦
 		}
 	}
-	PORTB |= (1<<PINB4);      //À­¸ßss
+	PORTB |= (1<<PINB4);      //æ‹‰é«˜ss
 }
 
 
 void ledmx_render_and_flush_indices(uint8_t index_mi, uint8_t time_remaining){
 	fb_clear();
-	fb_draw_glyph5x8(2,  font5x8_get_modeindex_u8(index_mi));  /* ×ó×Ö·û£ºq/p/b/d */
-	fb_draw_glyph5x8(9, font5x8_get_digit_u8(time_remaining));/* ÓÒ×Ö·û£º0..9   */
+	fb_draw_glyph5x8(2,  font5x8_get_modeindex_u8(index_mi));  /* å·¦å­—ç¬¦ï¼šq/p/b/d */
+	fb_draw_glyph5x8(9, font5x8_get_digit_u8(time_remaining));/* å³å­—ç¬¦ï¼š0..9   */
 	ledmx_flush();
 }
 
@@ -162,7 +162,7 @@ typedef struct {
 } Note;
 
 // Jingle????: ????3????????????
-// ??????????§»????????????????
+// ??????????Ğ©????????????????
 const Note jingle_melody[] = {
     {220, 250},  // ????1: ?????, 250ms
     {180, 250},  // ????2: ????, 250ms  
@@ -176,7 +176,7 @@ volatile uint8_t jingle_note_index = 0;   // ?????????????????
 volatile uint16_t jingle_note_timer = 0;  // ????????????????(ms)
 // ========== JINGLE ???????? ==========
 
-ISR(INT2_vect){								//?????§Ø?B2??????isr????????B2?????????£??????????????????????????????power_cont++
+ISR(INT2_vect){								//?????Ğ¶?B2??????isr????????B2?????????ä»¯??????????????????????????????power_cont++
 	power_cont++;
 	
 	// ???jingle?????????????
@@ -193,9 +193,9 @@ ISR(INT2_vect){								//?????§Ø?B2??????isr????????B2?????????£???????????????
 	howmany_ms_forbuzz = 0;
 }
 
-static volatile uint8_t cc;    //?????cc??????????????¦Â????????¦È?isr
-volatile uint16_t howmany_ms = 0;   // ????????????   ??????uint16_t?????§á????interrupt???? ?????¨´??????§Ø?
-volatile uint8_t  reach_1s = 0;   // "?? 1 ????"??§³???????
+static volatile uint8_t cc;    //?????cc??????????????Î²????????Î¸?isr
+volatile uint16_t howmany_ms = 0;   // ????????????   ??????uint16_t?????Ğ¿????interrupt???? ?????Ã¹??????Ğ¶?
+volatile uint8_t  reach_1s = 0;   // "?? 1 ????"??Ğ¡???????
 
 uint8_t index_mi = 0;
 uint8_t s0_s1;
@@ -212,7 +212,7 @@ volatile uint8_t howmany_ms_forled4;
 
 ISR(TIMER2_COMPA_vect){
 	cc = !cc;
-	display_digit(time_remaining,index_mi,cc);									//´Ë´¦ÊÇ¶Ôled¾ØÕó¶ÔssdÔÚidle×´Ì¬ÏÂÉÁË¸µÄdebugging
+	display_digit(time_remaining,index_mi,cc);									//æ­¤å¤„æ˜¯å¯¹ledçŸ©é˜µå¯¹ssdåœ¨idleçŠ¶æ€ä¸‹é—ªçƒçš„debugging
 	b0_debounce_1ms();				//???B0??B1???????????????????
 	b1_debounce_1ms();
 	howmany_ms++;
@@ -296,19 +296,19 @@ uint8_t spi_send_byte(uint8_t byte) {
 }
 
 void set_USART(void) {
-	UBRR0 = 25;                   // 8MHz / (16*19200) - 1 ¡Ö 25
-	UCSR0A = 0;                    // U2X0=0 Õı³£ËÙÂÊ
-	UCSR0B = (1<<RXEN0) | (1<<TXEN0) | (1<<RXCIE0);  // Ê¹ÄÜÊÕ·¢+½ÓÊÕÖĞ¶Ï
-	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);              // 8Î»Êı¾İ, 1Î»Í£Ö¹, ÎŞĞ£Ñé
+	UBRR0 = 25;                   // 8MHz / (16*19200) - 1 â‰ˆ 25
+	UCSR0A = 0;                    // U2X0=0 æ­£å¸¸é€Ÿç‡
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0) | (1<<RXCIE0);  // ä½¿èƒ½æ”¶å‘+æ¥æ”¶ä¸­æ–­
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00);              // 8ä½æ•°æ®, 1ä½åœæ­¢, æ— æ ¡éªŒ
 }
 
 void transmit_onebyte(char a){
-	while(!(UCSR0A & (1<<UDRE0)));       // µÈ·¢ËÍ»º³åÇø¿Õ
-	UDR0 = a;                             // Ğ´Èë¼´¿ªÊ¼·¢ËÍ
+	while(!(UCSR0A & (1<<UDRE0)));       // ç­‰å‘é€ç¼“å†²åŒºç©º
+	UDR0 = a;                             // å†™å…¥å³å¼€å§‹å‘é€
 }
 
 void transmit_chars(const char *s){
-	while(*s) transmit_onebyte(*s++);          // Öğ×Ö·û·¢ËÍµ½Óöµ½'\0'
+	while(*s) transmit_onebyte(*s++);          // é€å­—ç¬¦å‘é€åˆ°é‡åˆ°'\0'
 }
 
 
@@ -356,7 +356,7 @@ void show_power(){
 void mode_selection(void){
 	s0_s1 = ((PINC>>5)&0x03);											//???????????pin????
 	uint8_t mask_code = 1<<(s0_s1);
-	PORTC = (PORTC&0xF0)|mask_code;										//??????¦Ë??s0??s1????????¦Ë???????????????????????????
+	PORTC = (PORTC&0xF0)|mask_code;										//??????Î»??s0??s1????????Î»???????????????????????????
 	index_mi = s0_s1;
 	time_remaining = init_time[s0_s1];
 	led_dirty = 1;
@@ -364,7 +364,7 @@ void mode_selection(void){
 
 void display_digit(uint8_t time_remaining, uint8_t index_mi, uint8_t cc)
 {
-	PORTC = (0x7F&PINC)|((0x01&cc)<<7);         //??¦Ë?cc?????c?????
+	PORTC = (0x7F&PINC)|((0x01&cc)<<7);         //??Î»?cc?????c?????
 	if (cc==0){									//??cc=0????????????cc=1???????????
 		PORTA = cooking_time[time_remaining];	
 	} 
@@ -422,7 +422,7 @@ void b1_debounce_1ms(void){
 
 // ========== ????JINGLE????? ==========
 void start_jingle(void) {
-	// ????¦Ê?????????beep
+	// ????Îº?????????beep
 	reach_250ms = 0;
 	howmany_ms_forbuzz = 0;
 	
@@ -472,7 +472,7 @@ void run_microwave() {
 			TCCR1A |= (1<<COM1B1);
 			OCR1A = 255;
 			OCR1B = 124;
-			cli();												//?????uint16_t???§á????interrupt???
+			cli();												//?????uint16_t???Ğ¿????interrupt???
 			reach_250ms = 0;
 			howmany_ms_forbuzz = 0;								
 			reach_1s   = 0;										// ????????? 1?????
@@ -508,7 +508,7 @@ void run_microwave() {
 				if (now_s0_s1 != last_s0_s1){
 					last_s0_s1 = now_s0_s1;
 					is_running = false;
-					// ???????§İ????????jingle
+					// ???????Ğ»????????jingle
 					if(jingle_playing) {
 						jingle_playing = 0;
 						jingle_note_index = 0;
@@ -628,33 +628,33 @@ void run_microwave() {
 }
 
 ISR(USART0_RX_vect) {
-	uint8_t c = UDR0;                  // ¶Á×ßÊı¾İ£¬Çå RXC ±êÖ¾
+	uint8_t c = UDR0;                  // è¯»èµ°æ•°æ®ï¼Œæ¸… RXC æ ‡å¿—
 
 	if (!id_printed && (c == '\r' || c == '\n')) {
 		id_printed = 1;
-		transmit_chars(student_id);    // ´òÓ¡ÄãµÄÑ§ºÅ
-		// Ò²¿ÉÒÔÔÚÕâÀï¶ÌÁÁ L4 ±íÊ¾ÊÕµ½ÃüÁî
+		transmit_chars(student_id);    // æ‰“å°ä½ çš„å­¦å·
+		// ä¹Ÿå¯ä»¥åœ¨è¿™é‡ŒçŸ­äº® L4 è¡¨ç¤ºæ”¶åˆ°å‘½ä»¤
 		// led_pulse_100ms();
 		return;
 	}
 	if (c == 'p') {
-		// cycle power level -> µÈĞ§ÓÚ B2
+		// cycle power level -> ç­‰æ•ˆäº B2
 		power_cont++;
 		show_power();
 		// led_pulse_100ms();
-		TCCR1A |= (1<<COM1B1);   // ¿ª OC1B
-		OCR1A = 195;             // Òô¸ß£¨ºÍ INT2 Ò»ÖÂ£©
-		OCR1B = 124;             // Õ¼¿Õ±È
-		cli();                   // ·ÀÖ¹Óë 1ms ÖĞ¶Ï²¢·¢
+		TCCR1A |= (1<<COM1B1);   // å¼€ OC1B
+		OCR1A = 195;             // éŸ³é«˜ï¼ˆå’Œ INT2 ä¸€è‡´ï¼‰
+		OCR1B = 124;             // å ç©ºæ¯”
+		cli();                   // é˜²æ­¢ä¸ 1ms ä¸­æ–­å¹¶å‘
 		reach_250ms = 0;
-		howmany_ms_forbuzz = 0;  // ÖØĞÂ¼Æ 250ms
+		howmany_ms_forbuzz = 0;  // é‡æ–°è®¡ 250ms
 		sei();
 		led4_should_light = 1;
 		} else if (c == 'r') {
-		// stop/reset timer -> µÈĞ§ÓÚ B1
-		b1_released++;                 // »òÖ±½Óµ÷ÓÃÄãÒÑÓĞµÄ´¦ÀíÂß¼­
+		// stop/reset timer -> ç­‰æ•ˆäº B1
+		b1_released++;                 // æˆ–ç›´æ¥è°ƒç”¨ä½ å·²æœ‰çš„å¤„ç†é€»è¾‘
 		TCCR1A |= (1<<COM1B1);
-		OCR1A = 155;             // B1 µÄÒô¸ß
+		OCR1A = 155;             // B1 çš„éŸ³é«˜
 		OCR1B = 124;
 		cli();
 		reach_250ms = 0;
@@ -664,10 +664,10 @@ ISR(USART0_RX_vect) {
 		led4_should_light = 1;
 
 		} else if (c == 's') {
-		// start/resume -> µÈĞ§ÓÚ B0
+		// start/resume -> ç­‰æ•ˆäº B0
 		b0_released++;
 		TCCR1A |= (1<<COM1B1);
-		OCR1A = 255;             // B0 µÄÒô¸ß
+		OCR1A = 255;             // B0 çš„éŸ³é«˜
 		OCR1B = 124;
 		cli();
 		reach_250ms = 0;
@@ -686,12 +686,12 @@ int main(void)
 	is_paused = false;
 	static const char id[] = "49843895\r\n";
 	transmit_chars(id);
-	sei();   //×¢ÒâĞŞ¸Ä»ØÀ´£¨£¿
+	sei();   //æ³¨æ„ä¿®æ”¹å›æ¥ï¼ˆï¼Ÿ
 
 	while (true) {
 		run_microwave();       
 		if (led_dirty) {
-			led_dirty = 0;  /* ÏÈÇå±êÖ¾£¬±ÜÃâÖØ¸´Ë¢ĞÂ */
+			led_dirty = 0;  /* å…ˆæ¸…æ ‡å¿—ï¼Œé¿å…é‡å¤åˆ·æ–° */
 			ledmx_render_and_flush_indices(index_mi, time_remaining);
 		}
 		led4_work();
